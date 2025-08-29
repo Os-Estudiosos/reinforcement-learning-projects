@@ -20,6 +20,10 @@ class Robot:
 
         self.mean_reward = 0                            #compute the mean reward to update the preference
 
+        self.culmutative_reward = 0
+
+        self.reward_record = []
+
         self.list_mean_reward = []                      #list of the mean rewards(to plot)
 
         self.atual_action = 'None'                      #save the atual action          
@@ -76,8 +80,13 @@ class Robot:
 
         return self.atual_action
     
+    def reset_rewards(self):
+        self.culmutative_reward = 0
+        self.reward_record.clear()
 
     def learn(self, reward, previous_state):
+        self.culmutative_reward += reward
+        self.reward_record.append(self.culmutative_reward)
 
         if previous_state == 'high':
             probabilities = self.probabilities_comp(self.numeric_preferences[0][:2])
