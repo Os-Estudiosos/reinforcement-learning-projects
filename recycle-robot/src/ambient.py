@@ -1,4 +1,5 @@
 import gymnasium
+import numpy as np
 from src.robot import Robot
 
 
@@ -11,12 +12,42 @@ class Ambient:
         self.agent = Robot(learning_rate)
 
         self.EPOCHS = epochs
+
+        self.rewards = {
+            "search": 1,
+            "wait": abs(np.random.standard_normal()),
+            "discharge": -3
+        }
     
-    def process_reward(self, action):
-        ...
+    def process_reward(self, action: str) -> int:
+        # Checks if the agent's battery is high or low
+        is_battery_high = self.agent.battery_high
+
+        # If it has a high battery
+        if is_battery_high:
+            if action == "search":  # I check wich action it tooked
+                # I randomize with probability 1-alpha that the battery changed its state
+                # from high to low battery
+                battery_got_low = np.random.random() < (1 - self.alpha)
+
+                if battery_got_low:  # If it got low
+                    self.agent.discharge()  # I execute the discharge function
+        else:
+            if action == "search":
+                ran_out_of_battery = np.random.random() < (1 - self.beta)
+
+                if ran_out_of_battery:
+                    return self.rewards["discharge"]
+        
+        # And then return the reward based on the action
+        return self.rewards[action]
     
     def run(self):
-        for _ in range(self.EPOCHS):
-            action = self.agent.choose()
+        for _ in range(self.EPOCHS):    # For each epoch
+            action = self.agent.choose()    # The agent chooses an action
 
+            # Processes the reward based on the passed action
             reward = self.process_reward(action)
+            
+            # The agent will learn based on the reward received
+            self.agent.learn(reward)
