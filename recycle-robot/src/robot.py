@@ -1,4 +1,3 @@
-import gymnasium
 import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
@@ -36,7 +35,7 @@ class Robot:
 
     def probabilities_comp(self, preferences):
         prob = np.array([
-                np.exp(preference) for preference in preferences
+            np.exp(preference) for preference in preferences
         ]) / (np.exp(preferences).sum())
 
         return prob
@@ -45,11 +44,12 @@ class Robot:
         
         if self.battery_high == True:    
             probabilities = self.probabilities_comp(self.numeric_preferences[0][:2])
-            probabilities = [*probabilities, 0]
+            # probabilities = [*probabilities, 0]
+            self.atual_action = np.random.choice(self.actions[:2], p=probabilities)
         else:
             probabilities = self.probabilities_comp(self.numeric_preferences[1])
+            self.atual_action = np.random.choice(self.actions, p=probabilities)
 
-        self.atual_action = np.random.choice(self.actions, p=probabilities)
 
         self.remember(self.atual_action)
 
@@ -58,14 +58,14 @@ class Robot:
         return self.atual_action
     
     
-    def learn(self, reward):
+    def learn(self, reward, previous_state):
 
-        if self.battery_high:    
+        if previous_state == 'high':
             probabilities = self.probabilities_comp(self.numeric_preferences[0][:2])
             if self.atual_action == 'wait':
                 self.numeric_preferences[0][0] = self.numeric_preferences[0][0] + self.learning_rate * (reward - self.mean_reward) * (1 - probabilities[0])
                 self.numeric_preferences[0][1] = self.numeric_preferences[0][1] - self.learning_rate * (reward - self.mean_reward) * probabilities[1]
-            else:
+            elif self.atual_action == 'search':
                 self.numeric_preferences[0][1] = self.numeric_preferences[0][1] + self.learning_rate * (reward - self.mean_reward) * (1 - probabilities[1])
                 self.numeric_preferences[0][0] = self.numeric_preferences[0][0] - self.learning_rate * (reward - self.mean_reward) * probabilities[0]
                 

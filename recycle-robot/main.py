@@ -12,14 +12,6 @@ def main():
 
     ambient.run()
 
-    A = np.exp(ambient.agent.numeric_preferences)
-    row_sums = A.sum(axis=1, keepdims=True)  # soma de cada linha
-    P = A / row_sums
-
-    print(ambient.agent.numeric_preferences)
-    print(A)
-    print(P)
-
 
 if __name__ == "__main__":
     main()
