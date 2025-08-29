@@ -57,20 +57,7 @@ class Ambient:
     def run(self):
         """Runs the ambient program
         """
-        for i in range(self.EPOCHS):    # For each epoch
-            print()
-            print("="*200)
-            print(f"Estamos na época {i}")
-
-            print(f"Preferências numéricas: {self.agent.numeric_preferences}")
-
-            A = np.exp(self.agent.numeric_preferences)
-            P = A.copy()
-            P[0,:2] = A[0,:2]/A[0,:2].sum(keepdims=True)
-            P[1] = A[1]/A[1].sum(keepdims=True)
-
-            print(f"Política: {P}")
-
+        for _ in range(self.EPOCHS):    # For each epoch
             action = self.agent.choose()    # The agent chooses an action
 
             # Processes the reward based on the passed action
