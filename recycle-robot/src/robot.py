@@ -28,11 +28,11 @@ class Robot:
     def recharge(self):
         self.battery_high = True
 
-    def discarge(self):
+    def discharge(self):
         self.battery_high = False
 
     def remember(self, action):
-        self.actions_record.append[action]
+        self.actions_record.append(action)
 
     def probabilities_comp(self, preferences):
         prob = np.array([
@@ -45,9 +45,10 @@ class Robot:
         
         if self.battery_high == True:    
             probabilities = self.probabilities_comp(self.numeric_preferences[0][:2])
+            probabilities = [*probabilities, 0]
         else:
             probabilities = self.probabilities_comp(self.numeric_preferences[1])
-                    
+
         self.atual_action = np.random.choice(self.actions, p=probabilities)
 
         self.remember(self.atual_action)

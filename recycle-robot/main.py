@@ -2,7 +2,12 @@ from src.ambient import Ambient
 
 
 def main():
-    ambient = Ambient()
+    ambient = Ambient(
+        .5,
+        .5,
+        .01,
+        1000
+    )
 
     ambient.run()
 
