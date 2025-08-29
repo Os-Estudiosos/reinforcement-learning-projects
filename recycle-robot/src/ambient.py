@@ -16,7 +16,7 @@ class Ambient:
         self.rewards = {
             "search": 1,
             "wait": abs(np.random.standard_normal()),
-            'recharge': 1,
+            'recharge': .5,
             "discharge": -3
         }
     
@@ -47,6 +47,7 @@ class Ambient:
                 ran_out_of_battery = np.random.random() < (1 - self.beta)
 
                 if ran_out_of_battery:
+                    self.agent.recharge()
                     return self.rewards["discharge"]
         
         # And then return the reward based on the action
