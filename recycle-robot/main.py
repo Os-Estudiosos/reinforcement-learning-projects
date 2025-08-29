@@ -11,6 +11,8 @@ def main():
 
     ambient.run()
 
+    print(ambient.agent.numeric_preferences)
+
 
 if __name__ == "__main__":
     main()

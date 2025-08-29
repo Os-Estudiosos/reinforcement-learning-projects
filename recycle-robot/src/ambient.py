@@ -16,7 +16,7 @@ class Ambient:
         self.rewards = {
             "search": 1,
             "wait": abs(np.random.standard_normal()),
-            'recharge': 0,
+            'recharge': 1,
             "discharge": -3
         }
     
