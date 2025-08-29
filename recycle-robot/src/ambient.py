@@ -20,6 +20,15 @@ class Ambient:
         }
     
     def process_reward(self, action: str) -> int:
+        """Processes the reward that will be given to the agent based on the
+        action passed as a parameter
+
+        Args:
+            action (str): Wich action the agant took. Can be "wait", "search" or "recharge"
+
+        Returns:
+            int: The numeric signal (reward)
+        """
         # Checks if the agent's battery is high or low
         is_battery_high = self.agent.battery_high
 
@@ -43,6 +52,8 @@ class Ambient:
         return self.rewards[action]
     
     def run(self):
+        """Runs the ambient program
+        """
         for _ in range(self.EPOCHS):    # For each epoch
             action = self.agent.choose()    # The agent chooses an action
 
