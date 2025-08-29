@@ -6,58 +6,77 @@ import numpy as np
 class Robot:
     def __init__(self, learning_rate):
 
-        self.learning_rate = learning_rate
+        self.learning_rate = learning_rate              #the parameter alpha to update the preferences
 
-        self.actions = ['wait', 'search', 'recharge']
+        self.actions = ['wait', 'search', 'recharge']   #list of possible actions 
 
-        self.battery_high = True 
+        self.battery_high = True                        #control of the state battery
         
-        self.step = 0
+        self.step = 0                                   #quantity of step
         
-        self.numeric_preferences = np.zeros((2,3))
+        self.numeric_preferences = np.zeros((2,3))      #the preferences of the robot
 
-        self.actions_record = []
+        self.actions_record = []                        #list of all actions(to plot)
 
-        self.mean_reward = 0
+        self.mean_reward = 0                            #compute the mean reward to update the preference
 
-        self.list_mean_reward = []
+        self.list_mean_reward = []                      #list of the mean rewards(to plot)
 
-        self.atual_action = ''
+        self.atual_action = 'None'                      #save the atual action          
 
     def recharge(self):
+        """Change the state of the robot to high batterry
+        """
         self.battery_high = True
 
     def discharge(self):
+        """Change the state of the robot to low batterry
+        """
         self.battery_high = False
 
-    def remember(self, action):
+    def save_action(self, action: str):
+        """Make a list to save the actions did.
+
+        Args:
+            action (str): name of the action.
+        """
         self.actions_record.append(action)
 
-    def probabilities_comp(self, preferences):
-        prob = np.array([
-            np.exp(preference) for preference in preferences
-        ]) / (np.exp(preferences).sum())
+    def probabilities_comp(self, preferences: np.array) -> np.array :
+        """Compute the array of probabilities of selection each action
+
+        Args:
+            preferences (array): array of the preferences of the robot of each action. 
+
+        Returns:
+            array: an array of the probability of selection each action
+        """
+        prob = np.array([                                        
+            np.exp(preference) for preference in preferences    #for each preference expoents the value
+        ]) / (np.exp(preferences).sum())                        #and divide by the sum of total expoents of each value
 
         return prob
 
-    def choose(self):
-        
-        if self.battery_high == True:    
-            probabilities = self.probabilities_comp(self.numeric_preferences[0][:2])
-            # probabilities = [*probabilities, 0]
-            self.atual_action = np.random.choice(self.actions[:2], p=probabilities)
-        else:
-            probabilities = self.probabilities_comp(self.numeric_preferences[1])
+    def choose(self) -> str :
+        """Choose the next action based in the preferences
+
+        Returns:
+            str: action choosed 
+        """
+        if self.battery_high == True:                                                   #if the state is high battery
+            probabilities = self.probabilities_comp(self.numeric_preferences[0][:2])    #compute each probability (just take the actions 'search' and 'wait' because recharge its not an option)
+            self.atual_action = np.random.choice(self.actions[:2], p=probabilities)     #choose on randomly based on the probability    
+        else:                                                                           #else the state is low battery 
+            probabilities = self.probabilities_comp(self.numeric_preferences[1])        #same thing but taking all the three states
             self.atual_action = np.random.choice(self.actions, p=probabilities)
 
+        self.save_action(self.atual_action)                                             #append on the list of actions 
 
-        self.remember(self.atual_action)
-
-        self.step += 1
+        self.step += 1                                                                  #increments the steps
 
         return self.atual_action
     
-    
+
     def learn(self, reward, previous_state):
 
         if previous_state == 'high':
