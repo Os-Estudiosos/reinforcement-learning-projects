@@ -38,7 +38,7 @@ def main():
 
         print(f'\033[91m{extra_message}\033[m')
 
-        resp = input('\033[97mWould you like to digit your the values of alpha and beta? (Y/N): \033[m')
+        resp = input('\033[97mWould you like to digit your the values of alpha and beta? (Y/N): \033[m').strip().upper()[0]
 
         if resp == 'N':
             break
@@ -80,16 +80,17 @@ def main():
     print('-'*20)
     print('\033[91mBEST AGENT\033[m')
     print(f'Learning Rate: {best_agent.learning_rate}')
-    print('Numeric Preferences:')
-    print(best_agent.numeric_preferences)
 
-    print('-'*20)
     A = np.exp(best_agent.numeric_preferences)
     P = A.copy()
     P[0,:2] = A[0,:2]/A[0,:2].sum()
     P[1] = A[1] / A[1].sum()
     P[0,2] = 0
 
+    print("Best policy:")
+    print(P)
+
+    print('-'*20)
 
     # Best Policy Heatmap
     Plots.plot_policy_heatmap(P)

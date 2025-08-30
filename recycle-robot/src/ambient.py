@@ -17,7 +17,7 @@ class Ambient:
 
         self.rewards = {
             "search": 1,
-            "wait": .4,
+            "wait": .5,
             'recharge': 1,
             "discharge": -3
         }
