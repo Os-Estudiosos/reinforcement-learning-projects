@@ -1,5 +1,3 @@
-import seaborn as sns
-import matplotlib.pyplot as plt
 import numpy as np
 
 
@@ -81,11 +79,12 @@ class Robot:
 
         return self.atual_action
     
-    def reset_rewards(self):
-        self.culmutative_reward = 0
-        self.reward_record.clear()
-
     def to_number_action(self):
+        """Relate each action to a number
+
+        Returns:
+            int: index of the column
+        """
         if self.atual_action == 'wait':
             return 0 
         elif self.atual_action == 'search':
@@ -93,29 +92,45 @@ class Robot:
         else:
             return 2
         
-    def learn(self, reward, previous_state):
-        self.culmutative_reward += reward
-        self.reward_record.append(self.culmutative_reward)
+    def update_secondary_actions(self, idx_actions: list, row: int, reward: int, probabilities: np.array):
+        """Update the other actions that is not the atual
 
-        row = 0 if previous_state == 'high' else 1
+        Args:
+            idx_actions (list): list of indexes of secondary actions
+            row (int): atual state
+            reward (int): reward of the main action
+            probabilities (array): probability of each action to be selected
+        """
+        for i in idx_actions:
+            self.numeric_preferences[row][i] = self.numeric_preferences[row][i] + self.learning_rate * (reward - self.mean_reward) * probabilities[i]
+        
+    def learn(self, reward: int, previous_state: str):
+        """Make the robot learn by updating the preferences and rewards
 
-        probabilities = self.probabilities_comp(self.numeric_preferences[row])
+        Args:
+            reward (int): value of action 
+            previous_state (str): 'high' or 'low' 
+        """
+        self.culmutative_reward += reward                                               #sum the rewards 
+        self.reward_record.append(self.culmutative_reward)                              #append the rewards
 
-        if self.atual_action == 'wait':
+        row = 0 if previous_state == 'high' else 1                                      #to index more easily
+
+        probabilities = self.probabilities_comp(self.numeric_preferences[row])          #take the probabilities for the atual state (row)
+
+        if self.atual_action == 'wait':                                                 #for each action
+            #we edit the main action by the own formula
             self.numeric_preferences[row][0] = self.numeric_preferences[row][0] + self.learning_rate * (reward - self.mean_reward) * (1 - probabilities[0])
-            for i in [1,2]:
-                self.numeric_preferences[row][i] = self.numeric_preferences[row][i] + self.learning_rate * (reward - self.mean_reward) * probabilities[i]
+            self.update_secondary_actions([1,2], row, reward, probabilities)            #and edit generically the seconds just passing his index 
 
         elif self.atual_action == 'search':
             self.numeric_preferences[row][1] = self.numeric_preferences[row][1] + self.learning_rate * (reward - self.mean_reward) * (1 - probabilities[1])
-            for i in [0,2]:
-                self.numeric_preferences[row][i] = self.numeric_preferences[row][i] - self.learning_rate * (reward - self.mean_reward) * probabilities[i]
+            self.update_secondary_actions([0,2], row, reward, probabilities)
 
         else:
             self.numeric_preferences[row][2] = self.numeric_preferences[row][2] + self.learning_rate * (reward - self.mean_reward) * (1 - probabilities[2])
-            for i in [0,1]:
-                self.numeric_preferences[row][i] = self.numeric_preferences[row][i] - self.learning_rate * (reward - self.mean_reward) * probabilities[i]
+            self.update_secondary_actions([0,1], row, reward, probabilities)
          
-        self.mean_reward = 1/self.step * (reward + (self.step - 1) * self.mean_reward)
+        self.mean_reward = 1/self.step * (reward + (self.step - 1) * self.mean_reward)  #update the mean reward
 
-        self.list_mean_reward.append(self.mean_reward)
+        self.list_mean_reward.append(self.mean_reward)                                  #update the list of mean reward
