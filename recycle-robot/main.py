@@ -46,6 +46,7 @@ def main():
             try:
                 ALPHA = float(input('\033[97mType the alpha value: \033[m'))
                 BETA = float(input('\033[97mType the beta value: \033[m'))
+                EPOCHS = int(input('\033[97mType the number of epochs: \033[m'))
 
                 if not (0 < ALPHA < 1 or 0 < BETA < 1):
                     raise ValueError
