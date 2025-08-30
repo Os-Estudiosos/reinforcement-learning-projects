@@ -4,6 +4,9 @@ from src.robot import Robot
 
 class Ambient:
     def __init__(self, alpha, beta, learning_rate, epochs):
+        self.original_alpha = alpha
+        self.original_beta = beta
+
         self.alpha = alpha
         self.beta = beta
         self.learning_rate = learning_rate
@@ -38,16 +41,22 @@ class Ambient:
                 # I randomize with probability 1-alpha that the battery changed its state
                 # from high to low battery
                 battery_got_low = np.random.random() < (1 - self.alpha)
-
+                self.alpha *= self.alpha  # As the time passes by, the chance of it stay in the
+                                          # high battery decreases
                 if battery_got_low:  # If it got low
+                    self.alpha = self.original_alpha
                     self.agent.discharge()  # I execute the discharge function
         else:  # If my battery is low
             if action == "search":  # And the agent go to search cans
                 # There is a probability of the battery running out
                 ran_out_of_battery = np.random.random() < (1 - self.beta)
 
+                self.beta *= self.beta  # As the time passes by, the chance of it stay in the
+                                        # low battery decreases
+
                 # If it runs out of battery
                 if ran_out_of_battery:
+                    self.beta = self.original_beta
                     self.agent.recharge()  # Someone will recharge it
                     
                     # I'll punish it

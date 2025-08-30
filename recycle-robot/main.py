@@ -23,16 +23,38 @@ def main():
     agents: list[Robot] = []
     
     # Visual part
-    clear_terminal()
+    extra_message = ""
+    while True:
+        clear_terminal()
 
-    print("-"*50)
-    print("\033[92;5mRECYCLE BIN ROBOT\033[m")
-    print("-"*50)
+        print("-"*50)
+        print("\033[92;5mRECYCLE BIN ROBOT\033[m")
+        print("-"*50)
 
-    print('\033[91mAMBIENT VARIABLES\033[m')
-    print(f'alpha := Probability of staying in high battery after search for can = {ALPHA}')
-    print(f'beta := Probability of staying in low battery after search for can = {BETA}')
-    print(f'number of epochs = {EPOCHS}')
+        print('\033[96mAMBIENT VARIABLES\033[m')
+        print(f'alpha := Probability of staying in high battery after search for can = {ALPHA}')
+        print(f'beta := Probability of staying in low battery after search for can = {BETA}')
+        print(f'number of epochs = {EPOCHS}')
+
+        print(f'\033[91m{extra_message}\033[m')
+
+        resp = input('\033[97mWould you like to digit your the values of alpha and beta? (Y/N): \033[m')
+
+        if resp == 'N':
+            break
+        elif resp == 'Y':
+            try:
+                ALPHA = float(input('\033[97mType the alpha value: \033[m'))
+                BETA = float(input('\033[97mType the beta value: \033[m'))
+
+                if not (0 < ALPHA < 1 or 0 < BETA < 1):
+                    raise ValueError
+            except ValueError:
+                extra_message = "You didn't type a number or you didn't type a number between 0 and 1, try again, please..."
+            else:
+                break
+        else:
+            extra_message = "Please, type Y or N"
 
     print("-"*20)
 
