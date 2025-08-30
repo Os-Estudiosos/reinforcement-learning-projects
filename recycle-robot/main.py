@@ -9,8 +9,8 @@ from utils import *
 
 def main():
     EPOCHS = 1000
-    ALPHA = .5
-    BETA = .5
+    ALPHA = .6
+    BETA = .4
     lambda_values = [
         0.001,
         0.025,
@@ -68,18 +68,51 @@ def main():
     P[1] = A[1] / A[1].sum()
     P[0,2] = 0
 
-    plots = Plots(
-        P,
-        (
-            
-        )
+
+    # Best Policy Heatmap
+    Plots.plot_policy_heatmap(P)
+
+    # Best agent culmutative rewards
+    Plots.plot_cum_total_rewards_policies(
+        EPOCHS,
+        [
+            [ best_agent.learning_rate, best_agent.reward_record ]
+        ],
+        "BEST AGENT'S CULMUTATIVE REWARD OVER THE EPOCHS",
+        "best_agent_culmutative_reward_over_the_epochs"
     )
 
-    # with yaspin(text=f"Training robot with Learning Rate {lr}", color="cyan") as spinner:
-    #     t = threading.Thread(target=ambient.run)
-    #     t.start()
-    #     t.join()
-    #     spinner.ok("✔️")
+    # All agents culmutative rewards
+    Plots.plot_cum_total_rewards_policies(
+        EPOCHS,
+        [
+            [ agent.learning_rate, agent.reward_record ] for agent in agents
+        ],
+        "ALL AGENTS CULMUTATIVE REWARD OVER THE EPOCHS COMPARISION",
+        "all_agents_culmutative_reward_over_the_epochs_comparision"
+    )
+
+    # Best agent mean rewards record
+    Plots.plot_cum_total_rewards_policies(
+        EPOCHS,
+        [
+            [ best_agent.learning_rate, best_agent.list_mean_reward ]
+        ],
+        "BEST AGENT'S MEAN REWARD OVER THE EPOCHS",
+        'best_agent_mean_reward_over_the_epochs'
+    )
+
+    # Agents mean reward over the epochs comparision
+    Plots.plot_cum_total_rewards_policies(
+        EPOCHS,
+        [
+            [ agent.learning_rate, agent.list_mean_reward ] for agent in agents
+        ],
+        "ALL AGENTS MEAN REWARD OVER THE EPOCHS COMPARISION",
+        'all_agents_mean_reward_over_the_epochs_comparision'
+    )
+
+    print('\033[91mLOADING THE PLOTS\033[m')
 
     print('-'*50)
 

@@ -41,12 +41,16 @@ class Ambient:
 
                 if battery_got_low:  # If it got low
                     self.agent.discharge()  # I execute the discharge function
-        else:
-            if action == "search":
+        else:  # If my battery is low
+            if action == "search":  # And the agent go to search cans
+                # There is a probability of the battery running out
                 ran_out_of_battery = np.random.random() < (1 - self.beta)
 
+                # If it runs out of battery
                 if ran_out_of_battery:
-                    self.agent.recharge()
+                    self.agent.recharge()  # Someone will recharge it
+                    
+                    # I'll punish it
                     return [ self.rewards["discharge"], agent_state ]
             if action == "recharge":
                 self.agent.recharge()
