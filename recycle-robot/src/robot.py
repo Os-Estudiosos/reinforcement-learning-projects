@@ -7,26 +7,27 @@ class Robot:
     def __init__(self, learning_rate):
 
         self.learning_rate = learning_rate              #the parameter alpha to update the preferences
-
-        self.actions = ['wait', 'search', 'recharge']   #list of possible actions 
+        
+        self.atual_action = 'None'                      #save the atual action   zv
 
         self.battery_high = True                        #control of the state battery
         
         self.step = 0                                   #quantity of step
         
+        self.mean_reward = 0                            #compute the mean reward to update the preference
+
+        self.culmutative_reward = 0                     #compute the sum of all rewards
+        
         self.numeric_preferences = np.zeros((2,3))      #the preferences of the robot
+
+        self.actions = ['wait', 'search', 'recharge']   #list of possible actions 
 
         self.actions_record = []                        #list of all actions(to plot)
 
-        self.mean_reward = 0                            #compute the mean reward to update the preference
-
-        self.culmutative_reward = 0
-
-        self.reward_record = []
+        self.reward_record = []                         #a list off all rewards
 
         self.list_mean_reward = []                      #list of the mean rewards(to plot)
-
-        self.atual_action = 'None'                      #save the atual action          
+       
 
     def recharge(self):
         """Change the state of the robot to high batterry
@@ -84,38 +85,37 @@ class Robot:
         self.culmutative_reward = 0
         self.reward_record.clear()
 
+    def to_number_action(self):
+        if self.atual_action == 'wait':
+            return 0 
+        elif self.atual_action == 'search':
+            return 1
+        else:
+            return 2
+        
     def learn(self, reward, previous_state):
         self.culmutative_reward += reward
         self.reward_record.append(self.culmutative_reward)
 
-        if previous_state == 'high':
-            probabilities = self.probabilities_comp(self.numeric_preferences[0][:2])
-            if self.atual_action == 'wait':
-                self.numeric_preferences[0][0] = self.numeric_preferences[0][0] + self.learning_rate * (reward - self.mean_reward) * (1 - probabilities[0])
-                self.numeric_preferences[0][1] = self.numeric_preferences[0][1] - self.learning_rate * (reward - self.mean_reward) * probabilities[1]
-            elif self.atual_action == 'search':
-                self.numeric_preferences[0][1] = self.numeric_preferences[0][1] + self.learning_rate * (reward - self.mean_reward) * (1 - probabilities[1])
-                self.numeric_preferences[0][0] = self.numeric_preferences[0][0] - self.learning_rate * (reward - self.mean_reward) * probabilities[0]
-                
+        row = 0 if previous_state == 'high' else 1
+
+        probabilities = self.probabilities_comp(self.numeric_preferences[row])
+
+        if self.atual_action == 'wait':
+            self.numeric_preferences[row][0] = self.numeric_preferences[row][0] + self.learning_rate * (reward - self.mean_reward) * (1 - probabilities[0])
+            for i in [1,2]:
+                self.numeric_preferences[row][i] = self.numeric_preferences[row][i] + self.learning_rate * (reward - self.mean_reward) * probabilities[i]
+
+        elif self.atual_action == 'search':
+            self.numeric_preferences[row][1] = self.numeric_preferences[row][1] + self.learning_rate * (reward - self.mean_reward) * (1 - probabilities[1])
+            for i in [0,2]:
+                self.numeric_preferences[row][i] = self.numeric_preferences[row][i] - self.learning_rate * (reward - self.mean_reward) * probabilities[i]
+
         else:
-            probabilities = self.probabilities_comp(self.numeric_preferences[1])
-            if self.atual_action == 'wait':
-                self.numeric_preferences[1][0] = self.numeric_preferences[1][0] + self.learning_rate * (reward - self.mean_reward) * (1 - probabilities[0])
-                self.numeric_preferences[1][1] = self.numeric_preferences[1][1] - self.learning_rate * (reward - self.mean_reward) * probabilities[1]
-                self.numeric_preferences[1][2] = self.numeric_preferences[1][2] - self.learning_rate * (reward - self.mean_reward) * probabilities[2]
-            elif self.atual_action == 'search':
-                self.numeric_preferences[1][0] = self.numeric_preferences[1][0] - self.learning_rate * (reward - self.mean_reward) * probabilities[0]
-                self.numeric_preferences[1][1] = self.numeric_preferences[1][1] + self.learning_rate * (reward - self.mean_reward) * (1 - probabilities[1])
-                self.numeric_preferences[1][2] = self.numeric_preferences[1][2] - self.learning_rate * (reward - self.mean_reward) * probabilities[2]
-            else:
-                self.numeric_preferences[1][0] = self.numeric_preferences[1][0] - self.learning_rate * (reward - self.mean_reward) * probabilities[0]
-                self.numeric_preferences[1][1] = self.numeric_preferences[1][1] - self.learning_rate * (reward - self.mean_reward) * probabilities[1]
-                self.numeric_preferences[1][2] = self.numeric_preferences[1][2] + self.learning_rate * (reward - self.mean_reward) * (1 - probabilities[2])
+            self.numeric_preferences[row][2] = self.numeric_preferences[row][2] + self.learning_rate * (reward - self.mean_reward) * (1 - probabilities[2])
+            for i in [0,1]:
+                self.numeric_preferences[row][i] = self.numeric_preferences[row][i] - self.learning_rate * (reward - self.mean_reward) * probabilities[i]
          
         self.mean_reward = 1/self.step * (reward + (self.step - 1) * self.mean_reward)
 
         self.list_mean_reward.append(self.mean_reward)
-        
-
-        
-         
