@@ -4,7 +4,7 @@ from src.robot import Robot
 from src.plot_funcs import Plots
 from yaspin import yaspin
 import threading
-from utils import *
+from config import clear_terminal
 
 
 def main():
@@ -105,8 +105,15 @@ def main():
         "BEST AGENT'S CULMUTATIVE REWARD OVER THE EPOCHS",
         "best_agent_culmutative_reward_over_the_epochs"
     )
+    
+    # Saving the best agent's cumulative rewards
+    with open("rewards/rewards.txt", "a", encoding="utf-8") as file:
+        file.write(f"Epochs: {EPOCHS}\n")
+        file.write(f"Best learning rate: {best_agent.learning_rate}\n")
+        file.write(f"Best cumulative rewards: {best_agent.reward_record}\n")
+    
 
-    # All agents culmutative rewards
+    # All agents cumulative rewards
     Plots.plot_cum_total_rewards_policies(
         EPOCHS,
         [

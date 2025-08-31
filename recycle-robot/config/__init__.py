@@ -8,3 +8,9 @@ def FIGURES_FOLDER() -> str:
         str: Dataset's path
     """
     return os.path.join(os.getcwd(), 'figures')
+
+def clear_terminal():
+    if os.name == 'nt':
+        os.system('cls')
+    else:
+        os.system('clear')

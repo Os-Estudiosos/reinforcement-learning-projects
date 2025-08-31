@@ -2,7 +2,7 @@ import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 import os
-from config import *
+from config import FIGURES_FOLDER
 
 class Plots:
     # Method to plot the policy heatmap
